@@ -1,4 +1,4 @@
-# Blender Seams to Plush Cloth Simulation (Fork)
+# Blender Seams to Plush Simulation
 
 A fork of the original Seams to Sewing Pattern addon for Blender, refactored for Blender 5.0+
 
@@ -18,7 +18,7 @@ This fork represents changes of the original addon:
 1. Download this repository as a ZIP file
 2. In Blender, go to `Edit > Preferences > Add-ons > Install...`
 3. Select the downloaded ZIP file
-4. Enable the addon "Seams to Sewing Pattern" in the list
+4. Enable the addon "Seams to Plush Simulation" in the list
 
 ## Troubleshooting
 
@@ -41,6 +41,7 @@ This is a fork of the original **Seams to Sewing Pattern** addon by **Thomas Kol
 GPL V2 - See [license.txt](./license.txt)
 
 This fork maintains the same GPL V2 license as the original addon.
+
 
 
 
