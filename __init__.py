@@ -5,8 +5,8 @@ Refactored for Blender 5.0+.
 """
 
 bl_info = {
-    'name': 'Plush Cloth Simulation',
-    'author': 'Thomas Kole (original), rtghgvf (fork)',
+    'name': 'Seams to Plush Simulation',
+    'author': 'Thomas Kole (original), ThundazZ (fork)',
     'version': 'First Init (0, 0)',
     'blender': (5, 0, 0),
     'category': 'Cloth',
