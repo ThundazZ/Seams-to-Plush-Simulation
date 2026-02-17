@@ -38,8 +38,9 @@ This is a fork of the original **Seams to Sewing Pattern** addon by **Thomas Kol
 
 ## License
 
-GPL V2 - See [GPL-license.txt](./GPL-license.txt)
+GPL V2 - See [license.txt](./license.txt)
 
 This fork maintains the same GPL V2 license as the original addon.
+
 
 
