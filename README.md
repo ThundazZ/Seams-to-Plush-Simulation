@@ -1,4 +1,4 @@
-# Blender Seams to Plush Simulation (Fork)
+# Blender Seams to Plush Cloth Simulation (Fork)
 
 A fork of the original Seams to Sewing Pattern addon for Blender, refactored for Blender 5.0+
 
