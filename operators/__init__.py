@@ -1,4 +1,4 @@
-"""Operators for Seams to Sewing Pattern addon"""
+"""Operators for Seams to Plush Simulation"""
 
 from .seams_to_sewing import Seams_To_SewingPattern
 from .boundary_remesh import BoundaryAlignedRemesher, Remesher
@@ -14,3 +14,4 @@ __all__ = [
     'OBJECT_OT_check_mesh_issues',
     'OBJECT_OT_seams_to_sewing_pattern_from_panel',
 ]
+
