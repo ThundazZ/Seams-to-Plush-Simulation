@@ -32,7 +32,7 @@ class SeamsToSewingPatternSettings(PropertyGroup):
     
     use_remesh: BoolProperty(
         name="Remesh",
-        description="Use Boundary Aligned Remesh to remesh",
+        description="Use Boundary Aligned Remesh",
         default=True,
     )
     
@@ -50,19 +50,10 @@ class SeamsToSewingPatternSettings(PropertyGroup):
         max=100000,
     )
     
-    # Cloth preparation options
-    # Note: enable_cloth_prep is not exposed in the UI - the cloth prep options
-    # box is always visible in the panel, but the execution logic gates on this
-    # property. This is by design to keep the code clear while not cluttering UI.
-    enable_cloth_prep: BoolProperty(
-        name="Enable Cloth Prep",
-        description="Enable additional cloth preparation steps (internal use)",
-        default=False,
-    )
-    
     scale_to_5m: BoolProperty(
         name="Scale to 5m",
-        description="Scale object to 5m height for realistic cloth simulation",
+        description="Scales object to ~5m height before simulation. If the object is not around 5m tall, cloth simulation will most likely break",
+
         default=True,
     )
     
@@ -78,9 +69,9 @@ class SeamsToSewingPatternSettings(PropertyGroup):
         description="Select cloth simulation preset to apply",
         items=(
             ('NONE', "None", "Do not apply cloth settings"),
-            ('PRESET_1', "Preset 1", "Light Fabric"),
-            ('PRESET_2', "Preset 2", "Medium Fabric"),
-            ('PRESET_3', "Preset 3", "Heavy Fabric"),
+            ('PRESET_1', "Preset 1", "Preset 1"),
+            ('PRESET_2', "Preset 2", "Preset 2"),
+            ('PRESET_3', "Preset 3", "Preset 3"),
         ),
         default='PRESET_1',
     )

@@ -24,49 +24,37 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
         if context.mode != 'OBJECT':
             bpy.ops.object.mode_set(mode='OBJECT')
         
-        source_object = active_object
-        working_object = active_object
-        
-        # Cloth prep step 1: Duplicate if enabled
-        if settings.enable_cloth_prep:
-            working_object = self._duplicate_object(context)
-            use_keep_original = False  # Already duplicated
-        else:
-            use_keep_original = settings.keep_original
-        
-        # Cloth prep step 2: Scale to 5m if enabled
-        if settings.enable_cloth_prep and settings.scale_to_5m:
-            self._scale_to_5m(working_object)
-        
-        # Cloth prep step 3: Prepare mesh
-        if settings.enable_cloth_prep:
+        # If scale_to_5m is on we must scale before seams runs.
+        # When keep_original is also on, duplicate here first so the original
+        # is never touched, then tell the seams operator not to duplicate again.
+        use_keep_original = settings.keep_original
+        if settings.scale_to_5m:
+            if settings.keep_original:
+                # Duplicate now, work on the copy
+                bpy.ops.object.duplicate()
+                active_object = context.active_object
+                use_keep_original = False  # already duplicated
+            self._scale_to_5m(active_object)
             self._prepare_mesh()
         
         # Main operation: Run Seams to Sewing Pattern
         if not self._run_seams_to_sewing(settings, use_keep_original):
             return {'CANCELLED'}
         
-        # Cloth prep step 4: Fix normals if enabled
-        if settings.enable_cloth_prep and settings.fix_normals:
+        # Fix normals if enabled
+        if settings.fix_normals:
             self._fix_normals()
         
-        # Cloth prep step 5: Apply cloth preset if enabled
-        if settings.enable_cloth_prep and settings.cloth_preset != 'NONE':
+        # Apply cloth preset if one is selected
+        if settings.cloth_preset != 'NONE':
             self._apply_cloth_preset(context, settings.cloth_preset)
         
-        # Cloth prep step 6: Play animation if enabled
-        if settings.enable_cloth_prep and settings.play_animation:
+        # Play animation if enabled
+        if settings.play_animation:
             self._start_animation(context)
         
         self.report({'INFO'}, "Cloth simulation setup complete!")
         return {'FINISHED'}
-    
-    def _duplicate_object(self, context):
-        """Duplicate the active object"""
-        bpy.ops.object.duplicate()
-        working_object = context.active_object
-        self.report({'INFO'}, "Created duplicate for cloth prep")
-        return working_object
     
     def _scale_to_5m(self, obj):
         """Scale object to 5m height for realistic cloth simulation"""

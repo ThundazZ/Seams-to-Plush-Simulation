@@ -46,8 +46,6 @@ class VIEW3D_PT_seams_to_sewing_pattern(Panel):
         layout.separator()
         
         # Cloth Preparation section
-        # Note: enable_cloth_prep property exists but is not exposed in UI
-        # The cloth prep options are shown but controlled internally
 
         box = layout.box()
         box.label(text="Preparation Options:", icon='MOD_CLOTH')
