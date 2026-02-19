@@ -5,8 +5,8 @@ from bpy.props import BoolProperty, IntProperty, EnumProperty, FloatProperty, St
 from bpy.types import PropertyGroup
 
 
-class SeamsToSewingPatternSettings(PropertyGroup):
-    """Settings for Seams to Sewing Pattern operator
+class SeamsToPlushSettings(PropertyGroup):
+    """Settings for Seams to Plush Simulation operator
     
     This serves as the single source of truth for all operator settings.
     Properties are stored in the scene and accessed by panel operators.
@@ -26,7 +26,7 @@ class SeamsToSewingPatternSettings(PropertyGroup):
     
     keep_original: BoolProperty(
         name="Work on duplicate",
-        description="Creates a duplicate of the selected object and operates on that instead. This keeps your original object intact.",
+        description="Duplicates the object before processing. Keeps your original mesh untouched",
         default=True,
     )
     
@@ -44,10 +44,10 @@ class SeamsToSewingPatternSettings(PropertyGroup):
     
     target_tris: IntProperty(
         name="Target number of triangles",
-        description="Actual number of triangle might be a bit off",
+        description="Target triangle count after remeshing. Recommended: 5k–10k. Higher values significantly slow down simulation.",
         default=5000,
-        min=100,
-        max=100000,
+        min=1000,
+        max=20000,
     )
     
     scale_to_5m: BoolProperty(

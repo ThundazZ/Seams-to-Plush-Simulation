@@ -1,14 +1,14 @@
-"""Panel UI for Seams to Sewing Pattern addon"""
+"""Panel UI for Seams to Plush Simulation addon"""
 
 import bpy
 from bpy.types import Panel
 
 
-class VIEW3D_PT_seams_to_sewing_pattern(Panel):
-    """Panel for Seams to Sewing Pattern in 3D View N-panel"""
+class VIEW3D_PT_seams_to_plush(Panel):
+    """Panel for Seams to Plush Simulation in 3D View N-panel"""
     
-    bl_label = "Seams to Sewing Pattern"
-    bl_idname = "VIEW3D_PT_seams_to_sewing_pattern"
+    bl_label = "Seams to Plush Simulation"
+    bl_idname = "VIEW3D_PT_seams_to_plush"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Tool'
@@ -16,7 +16,7 @@ class VIEW3D_PT_seams_to_sewing_pattern(Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        settings = scene.seams_to_sewing_pattern_settings
+        settings = scene.seams_to_plush_settings
         
         layout.separator()
         
@@ -79,7 +79,7 @@ class VIEW3D_PT_seams_to_sewing_pattern(Panel):
         # Execute button
         row = layout.row()
         row.scale_y = 1.5
-        row.operator("object.seams_to_sewingpattern_from_panel", 
+        row.operator("object.seams_to_plush_from_panel", 
                     text="Execute", 
                     icon="PLAY")
     
@@ -88,13 +88,13 @@ class VIEW3D_PT_seams_to_sewing_pattern(Panel):
         # Determine prefix based on selected preset
         if preset_name == 'PRESET_1':
             prefix = 'preset1'
-            label = "Light Fabric Settings"
+            label = "Preset 1 Settings"
         elif preset_name == 'PRESET_2':
             prefix = 'preset2'
-            label = "Medium Fabric Settings"
+            label = "Preset 2 Settings"
         elif preset_name == 'PRESET_3':
             prefix = 'preset3'
-            label = "Heavy Fabric Settings"
+            label = "Preset 3 Settings"
         else:
             return
         

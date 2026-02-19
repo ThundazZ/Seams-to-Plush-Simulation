@@ -2,7 +2,6 @@
 
 import bpy
 import bmesh
-from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
@@ -38,8 +37,8 @@ class BoundaryAlignedRemesher:
     
     def nearest_boundary_vector(self, location):
         """Gets the nearest boundary direction"""
-        location, index, dist = self.boundary_kd_tree.find(location)
-        location, vec = self.boundary_data[index]
+        _co, index, _dist = self.boundary_kd_tree.find(location)
+        _center, vec = self.boundary_data[index]
         return vec
     
     def enforce_edge_length(self, edge_length=0.05, bias=0.333):
@@ -182,9 +181,14 @@ class Remesher(bpy.types.Operator):
         default=True
     )
     
+    @classmethod
+    def poll(cls, context):
+        return (context.active_object is not None
+                and context.active_object.type == 'MESH'
+                and context.mode == 'OBJECT')
+    
     def execute(self, context):
-        obj = bpy.context.active_object
-        print(f"Remeshing {obj.name}")
+        obj = context.active_object
         
         # Create temp copy of mesh for UV transfer before remeshing
         temp_obj = None
@@ -201,6 +205,7 @@ class Remesher(bpy.types.Operator):
                 self.reproject
             )
             bm.to_mesh(obj.data)
+            bm.free()
             
             # Transfer UVs from pre-remesh mesh to remeshed mesh
             if temp_obj:

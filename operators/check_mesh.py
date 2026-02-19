@@ -13,8 +13,6 @@ class OBJECT_OT_check_mesh_issues(Operator):
     bl_label = "Check Mesh Issues"
     bl_options = {'REGISTER'}
     
-    issues: bpy.props.StringProperty(default="")
-    
     @staticmethod
     def check_and_select_unmerged_verts(obj):
         """Check for unmerged vertices and select them in edit mode using KDTree
@@ -25,10 +23,7 @@ class OBJECT_OT_check_mesh_issues(Operator):
         if obj.type != 'MESH':
             return 0
         
-        # Enter edit mode
-        bpy.ops.object.mode_set(mode='EDIT')
-        
-        # Get bmesh from edit mode
+        # Get bmesh from edit mode (already in edit mode from execute)
         bm = bmesh.from_edit_mesh(obj.data)
         bm.verts.ensure_lookup_table()
         
@@ -148,5 +143,4 @@ class OBJECT_OT_check_mesh_issues(Operator):
             if original_mode == 'OBJECT':
                 bpy.ops.object.mode_set(mode='OBJECT')
         
-        self.issues = msg
         return {'FINISHED'}

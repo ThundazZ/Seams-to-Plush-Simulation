@@ -1,4 +1,4 @@
-"""Main Seams to Sewing Pattern operator"""
+"""Main Seams to Plush Simulation operator"""
 
 import bpy
 from collections import defaultdict
@@ -13,24 +13,24 @@ from bpy.props import (
 )
 
 
-class Seams_To_SewingPattern(Operator):
-    """Convert a manifold mesh with seams into sewing patterns for cloth simulation"""
+class OBJECT_OT_seams_to_plush(Operator):
+    """Convert a manifold mesh with seams into patterns for plush cloth simulation"""
     
-    bl_idname = "object.seams_to_sewingpattern"
-    bl_label = "Seams to Sewing Pattern"
+    bl_idname = "object.seams_to_plush"
+    bl_label = "Seams to Plush Simulation"
     bl_description = (
-        "Converts a manifold mesh with seams into a sewing pattern for cloth"
-        " simulation"
+        "Converts a manifold mesh with seams into flattened patterns for plush"
+        " cloth simulation"
     )
     bl_options = {'REGISTER', 'UNDO'}
 
-    # Properties - kept in operator for F3 search functionality
-    # When called from panel, these are overridden by scene settings
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None and context.active_object.type == 'MESH'
+
     do_unwrap: EnumProperty(
         name="Unwrap",
-        description=(
-            "Perform an unwrap before unfolding. Identical to UV > Unwrap"
-        ),
+        description="Perform an unwrap before unfolding. Identical to UV > Unwrap",
         items=(
             ('ANGLE_BASED', "Angle based", ""),
             ('CONFORMAL', "Conformal", ""),
@@ -40,10 +40,7 @@ class Seams_To_SewingPattern(Operator):
     )
     keep_original: BoolProperty(
         name="Work on duplicate",
-        description=(
-            "Creates a duplicate of the selected object and operates on that"
-            " instead. This keeps your original object intact."
-        ),
+        description="Creates a duplicate of the selected object and operates on that instead.",
         default=True,
     )
     use_remesh: BoolProperty(
@@ -62,45 +59,9 @@ class Seams_To_SewingPattern(Operator):
         default=5000,
     )
 
-    def invoke(self, context, event):
-        """Show dialog when operator is invoked"""
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=250)
-
-    def draw(self, context):
-        """Draw operator dialog UI"""
-        layout = self.layout
-        row = layout.row()
-        row.label(
-            text="Unfolds this mesh by cutting along seams.", icon='INFO'
-        )
-        layout.separator()
-        layout.row()
-        layout.row()
-        row = layout.row()
-        row.prop(self, "do_unwrap")
-        if self.do_unwrap == 'KEEP':
-            row = layout.row()
-            row.alignment = 'EXPAND'
-            row.label(
-                text="Ensure your seams match your UV's!", icon='EDGESEL'
-            )
-
-        layout.row()
-        row = layout.row()
-        row.prop(self, "keep_original")
-        row = layout.row()
-        row.prop(self, "apply_modifiers")
-        row = layout.row()
-        row.prop(self, "use_remesh")
-        row = layout.row()
-        row.prop(self, "target_tris")
-        row.enabled = self.use_remesh
-        layout.row()
-
     def execute(self, context):
         """Main execution method"""
-        wm = bpy.context.window_manager
+        wm = context.window_manager
         
         # Prepare object (duplicate, apply modifiers)
         obj = self._prepare_object(context)
@@ -109,7 +70,7 @@ class Seams_To_SewingPattern(Operator):
         
         # Enter edit mode and unwrap
         bpy.ops.object.mode_set(mode='EDIT')
-        obj = bpy.context.edit_object
+        obj = context.edit_object
         me = obj.data
         
         bm = self._unwrap_mesh(context, obj, me)
@@ -140,11 +101,9 @@ class Seams_To_SewingPattern(Operator):
         # Final adjustments
         self._finalize(obj, me, area_before, area_after, max_edge_length)
         
-        wm.progress_end()
-        
         # Fix progress cursor issue
-        bpy.context.window.cursor_set('NONE')
-        bpy.context.window.cursor_set('DEFAULT')
+        context.window.cursor_set('NONE')
+        context.window.cursor_set('DEFAULT')
         
         return {'FINISHED'}
     
@@ -152,21 +111,21 @@ class Seams_To_SewingPattern(Operator):
         """Duplicate object if needed and apply modifiers"""
         if self.keep_original:
             # Duplicate selection to keep original
-            src_obj = bpy.context.active_object
+            src_obj = context.active_object
             obj = src_obj.copy()
             obj.data = src_obj.data.copy()
             obj.animation_data_clear()
-            bpy.context.collection.objects.link(obj)
+            context.collection.objects.link(obj)
 
             obj.select_set(True)
             src_obj.select_set(False)
-            bpy.context.view_layer.objects.active = obj
+            context.view_layer.objects.active = obj
         else:
-            obj = bpy.context.active_object
+            obj = context.active_object
 
         if self.apply_modifiers:
             bpy.ops.object.convert(target='MESH')
-            obj = bpy.context.active_object
+            obj = context.active_object
         
         return obj
     
@@ -236,6 +195,7 @@ class Seams_To_SewingPattern(Operator):
 
         # Collapse degenerate edges
         bmesh.ops.collapse(bm, edges=degenerate_edges, uvs=True)
+        bmesh.update_edit_mesh(me)
         bpy.ops.mesh.delete(type='ONLY_FACE')
         
         return True
@@ -263,10 +223,12 @@ class Seams_To_SewingPattern(Operator):
             progress += len(selected_faces)
             wm.progress_update((progress / progress_max) * 99)
         
+        wm.progress_end()
         return face_groups
     
     def _flatten_islands(self, bm, me, face_groups, wm):
         """Flatten each island using UV coordinates"""
+        wm.progress_begin(0, 99)
         uv_layer = bm.loops.layers.uv.active
         progress = 0
         area_before = 0
@@ -311,12 +273,18 @@ class Seams_To_SewingPattern(Operator):
             average_uv_position /= uv_position_samples
             average_tangent = average_tangent.normalized()
             average_bitangent = average_bitangent.normalized()
-            average_normal = average_tangent.cross(
-                average_bitangent
-            ).normalized()
+            average_normal = average_tangent.cross(average_bitangent)
+            if average_normal.length < 1e-6:
+                # Fallback for degenerate UV islands (collinear/coincident UVs)
+                average_normal = mathutils.Vector((0, 0, 1))
+            else:
+                average_normal = average_normal.normalized()
             halfvector = average_bitangent + average_tangent
             halfvector /= 2
-            halfvector.normalize()
+            if halfvector.length < 1e-6:
+                halfvector = average_tangent.copy()
+            else:
+                halfvector.normalize()
             
             # Straighten out half vector
             halfvector = average_normal.cross(halfvector)
@@ -351,12 +319,17 @@ class Seams_To_SewingPattern(Operator):
             bmesh.update_edit_mesh(me)
             area_after += sum(f.calc_area() for f in g)
         
+        wm.progress_end()
         return area_before, area_after
     
     def _finalize(self, obj, me, area_before, area_after, max_edge_length):
         """Final scaling, cleanup, and remeshing"""
         # Scale to maintain area
-        area_ratio = math.sqrt(area_before / area_after)
+        if area_after == 0:
+            self.report({'WARNING'}, "Could not calculate area ratio (area_after=0), skipping scale")
+            area_ratio = 1.0
+        else:
+            area_ratio = math.sqrt(area_before / area_after)
         bpy.ops.mesh.select_all(action='SELECT')
         previous_pivot = bpy.context.scene.tool_settings.transform_pivot_point
         bpy.context.scene.tool_settings.transform_pivot_point = (
@@ -406,3 +379,4 @@ class Seams_To_SewingPattern(Operator):
         bmesh.ops.triangulate(
             mesh, faces=mesh.faces, quad_method='BEAUTY', ngon_method='BEAUTY'
         )
+        wm.progress_end()

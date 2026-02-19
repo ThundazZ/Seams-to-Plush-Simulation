@@ -1,18 +1,18 @@
-"""Panel-based operator for Seams to Sewing Pattern with cloth prep options"""
+"""Panel-based operator for Seams to Plush Simulation with cloth prep options"""
 
 import bpy
 from bpy.types import Operator
 
 
-class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
-    """Execute Seams to Sewing Pattern with panel settings and optional cloth preparation"""
+class OBJECT_OT_seams_to_plush_from_panel(Operator):
+    """Execute Seams to Plush Simulation with panel settings and optional cloth preparation"""
     
-    bl_idname = "object.seams_to_sewingpattern_from_panel"
-    bl_label = "Seams to Sewing Pattern from Panel"
+    bl_idname = "object.seams_to_plush_from_panel"
+    bl_label = "Seams to Plush Simulation from Panel"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
-        settings = context.scene.seams_to_sewing_pattern_settings
+        settings = context.scene.seams_to_plush_settings
         
         # Validate object selection
         active_object = context.active_object
@@ -37,8 +37,8 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
             self._scale_to_5m(active_object)
             self._prepare_mesh()
         
-        # Main operation: Run Seams to Sewing Pattern
-        if not self._run_seams_to_sewing(settings, use_keep_original):
+        # Main operation: Run Seams to Plush Simulation
+        if not self._run_seams_to_plush(settings, use_keep_original):
             return {'CANCELLED'}
         
         # Fix normals if enabled
@@ -53,7 +53,6 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
         if settings.play_animation:
             self._start_animation(context)
         
-        self.report({'INFO'}, "Cloth simulation setup complete!")
         return {'FINISHED'}
     
     def _scale_to_5m(self, obj):
@@ -63,7 +62,6 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
             target_z = 5.0
             scale_factor = target_z / current_z
             obj.scale *= scale_factor
-            self.report({'INFO'}, f"Scaled to 5m (scale factor: {scale_factor:.2f})")
         else:
             self.report({'WARNING'}, "Object has zero Z dimension, skipping scale")
     
@@ -73,24 +71,22 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
             bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
             bpy.ops.object.convert(target='MESH')
             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-            self.report({'INFO'}, "Converted to mesh and set origin")
         except Exception as e:
             self.report({'WARNING'}, f"Could not prepare mesh: {str(e)}")
     
-    def _run_seams_to_sewing(self, settings, use_keep_original):
-        """Execute the main Seams to Sewing Pattern operator"""
+    def _run_seams_to_plush(self, settings, use_keep_original):
+        """Execute the main Seams to Plush Simulation operator"""
         try:
-            bpy.ops.object.seams_to_sewingpattern(
+            bpy.ops.object.seams_to_plush(
                 do_unwrap=settings.do_unwrap,
                 keep_original=use_keep_original,
                 apply_modifiers=settings.apply_modifiers,
                 use_remesh=settings.use_remesh,
                 target_tris=settings.target_tris
             )
-            self.report({'INFO'}, "Seams to Sewing Pattern completed")
             return True
         except Exception as e:
-            self.report({'ERROR'}, f"Failed to run seams_to_sewingpattern: {str(e)}")
+            self.report({'ERROR'}, f"Failed to run seams_to_plush: {str(e)}")
             return False
     
     def _fix_normals(self):
@@ -100,7 +96,6 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
             bpy.ops.mesh.select_all(action='SELECT')
             bpy.ops.mesh.set_normals_from_faces()
             bpy.ops.object.mode_set(mode='OBJECT')
-            self.report({'INFO'}, "Fixed normals")
         except Exception as e:
             self.report({'WARNING'}, f"Could not fix normals: {str(e)}")
     
@@ -112,18 +107,18 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
                 self.report({'WARNING'}, "No active object to apply cloth preset")
                 return
             
-            settings = context.scene.seams_to_sewing_pattern_settings
+            settings = context.scene.seams_to_plush_settings
             
             # Determine prefix based on preset
             if preset_name == 'PRESET_1':
                 prefix = 'preset1'
-                name = 'Light Fabric'
+                name = 'Preset 1'
             elif preset_name == 'PRESET_2':
                 prefix = 'preset2'
-                name = 'Medium Fabric'
+                name = 'Preset 2'
             elif preset_name == 'PRESET_3':
                 prefix = 'preset3'
-                name = 'Heavy Fabric'
+                name = 'Preset 3'
             else:
                 self.report({'WARNING'}, f"Unknown preset: {preset_name}")
                 return
@@ -160,23 +155,38 @@ class OBJECT_OT_seams_to_sewing_pattern_from_panel(Operator):
             cloth_mod.settings.sewing_force_max = getattr(settings, f"{prefix}_sewing_force_max")
             
             # Collision
+            cloth_mod.collision_settings.use_collision = False
             cloth_mod.collision_settings.use_self_collision = getattr(settings, f"{prefix}_use_self_collision")
             
             # Gravity
             use_gravity = getattr(settings, f"{prefix}_use_gravity")
             cloth_mod.settings.effector_weights.gravity = 1.0 if use_gravity else 0.0
             
-            self.report({'INFO'}, f"Applied cloth preset: {name}")
-            
         except Exception as e:
             self.report({'WARNING'}, f"Could not apply cloth preset: {str(e)}")
     
     def _start_animation(self, context):
-        """Start animation playback and enter local view"""
+        """Enter local view, then start animation playback"""
         try:
-            bpy.ops.view3d.localview()
+            found = False
+            for window in bpy.context.window_manager.windows:
+                if found:
+                    break
+                for area in window.screen.areas:
+                    if area.type == 'VIEW_3D':
+                        for region in area.regions:
+                            if region.type == 'WINDOW':
+                                with bpy.context.temp_override(
+                                    window=window,
+                                    area=area,
+                                    region=region,
+                                ):
+                                    bpy.ops.view3d.localview()
+                                found = True
+                                break
+                        break
+
             context.scene.frame_set(0)
             bpy.ops.screen.animation_play()
-            self.report({'INFO'}, "Animation started - local view enabled")
         except Exception as e:
             self.report({'WARNING'}, f"Could not start animation/local view: {str(e)}")

@@ -43,33 +43,35 @@ class QuickClothsim(Operator):
         return context.mode == 'OBJECT'
 
     def execute(self, context):
-        objects = bpy.context.selected_objects
-        if objects is not None:
-            for obj in objects:
-                cloth_mod = obj.modifiers.new(name='Cloth', type='CLOTH')
+        objects = context.selected_objects
+        for obj in objects:
+            cloth_mod = obj.modifiers.new(name='Cloth', type='CLOTH')
+            
+            # Pressure settings
+            if self.pressure_style != 'OFF':
+                cloth_mod.settings.use_pressure = True
                 
-                # Pressure settings
-                if self.pressure_style != 'OFF':
-                    cloth_mod.settings.use_pressure = True
+            if self.pressure_style == 'MEDIUM':
+                cloth_mod.settings.uniform_pressure_force = 10
+            elif self.pressure_style == 'HIGH':
+                cloth_mod.settings.uniform_pressure_force = 50
                     
-                if self.pressure_style == 'MEDIUM':
-                    cloth_mod.settings.uniform_pressure_force = 10
-                elif self.pressure_style == 'HIGH':
-                    cloth_mod.settings.uniform_pressure_force = 50
-                        
-                # Sewing settings
-                cloth_mod.settings.use_sewing_springs = self.use_sewing
+            # Sewing settings
+            cloth_mod.settings.use_sewing_springs = self.use_sewing
+            if self.use_sewing:
                 if self.pressure_style == 'MEDIUM':
                     cloth_mod.settings.sewing_force_max = 5
                 elif self.pressure_style == 'HIGH':
                     cloth_mod.settings.sewing_force_max = 15
-                
-                # Air viscosity
-                if self.air_visc:
-                    cloth_mod.settings.air_damping = 10
-                    
-                # Gravity
-                if not self.use_gravity:
-                    cloth_mod.settings.effector_weights.gravity = 0
-                    
+                else:
+                    cloth_mod.settings.sewing_force_max = 5
+            
+            # Air viscosity
+            if self.air_visc:
+                cloth_mod.settings.air_damping = 10
+
+            # Gravity
+            if not self.use_gravity:
+                cloth_mod.settings.effector_weights.gravity = 0
+
         return {'FINISHED'}
