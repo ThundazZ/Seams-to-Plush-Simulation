@@ -190,3 +190,6 @@ class OBJECT_OT_seams_to_plush_from_panel(Operator):
             bpy.ops.screen.animation_play()
         except Exception as e:
             self.report({'WARNING'}, f"Could not start animation/local view: {str(e)}")
+
+
+

@@ -349,13 +349,14 @@ class OBJECT_OT_seams_to_plush(Operator):
         # Optional remesh
         if self.use_remesh and max_edge_length is not None:
             bpy.ops.mesh.dissolve_limited(angle_limit=0.01)
+            bmesh.update_edit_mesh(me)
             bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
             bpy.ops.remesh.boundary_aligned_remesh(
                 edge_length=max_edge_length, iterations=10, 
                 reproject=False, preserve_uvs=True
             )
-
-        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        else:
+            bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
 
     def ensure_edgelength(self, max_length, mesh, wm):
         """Subdivide long seam edges to target length"""

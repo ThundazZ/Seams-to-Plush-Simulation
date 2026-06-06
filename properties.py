@@ -91,11 +91,11 @@ class SeamsToPlushSettings(PropertyGroup):
         items=[('LINEAR', "Linear", ""), ('ANGULAR', "Angular", "")],
         default='LINEAR'
     )
-    preset1_tension_stiffness: FloatProperty(name="Tension", default=15, min=0.0, max=1000.0)
+    preset1_tension_stiffness: FloatProperty(name="Structural", default=15, min=0.0, max=1000.0)
     preset1_compression_stiffness: FloatProperty(name="Compression", default=15, min=0.0, max=1000.0)
     preset1_shear_stiffness: FloatProperty(name="Shear", default=5, min=0.0, max=1000.0)
     preset1_bending_stiffness: FloatProperty(name="Bending", default=1.5, min=0.0, max=1000.0)
-    preset1_tension_damping: FloatProperty(name="Tension Damp", default=5, min=0.0, max=50.0)
+    preset1_tension_damping: FloatProperty(name="Structural Damp", default=5, min=0.0, max=50.0)
     preset1_compression_damping: FloatProperty(name="Compression Damp", default=5, min=0.0, max=50.0)
     preset1_shear_damping: FloatProperty(name="Shear Damp", default=5, min=0.0, max=50.0)
     preset1_bending_damping: FloatProperty(name="Bending Damp", default=0.5, min=0.0, max=50.0)
@@ -115,11 +115,11 @@ class SeamsToPlushSettings(PropertyGroup):
         items=[('LINEAR', "Linear", ""), ('ANGULAR', "Angular", "")],
         default='ANGULAR'
     )
-    preset2_tension_stiffness: FloatProperty(name="Tension", default=25, min=0.0, max=1000.0)
+    preset2_tension_stiffness: FloatProperty(name="Structural", default=25, min=0.0, max=1000.0)
     preset2_compression_stiffness: FloatProperty(name="Compression", default=25, min=0.0, max=1000.0)
     preset2_shear_stiffness: FloatProperty(name="Shear", default=10, min=0.0, max=1000.0)
     preset2_bending_stiffness: FloatProperty(name="Bending", default=5, min=0.0, max=1000.0)
-    preset2_tension_damping: FloatProperty(name="Tension Damp", default=10, min=0.0, max=50.0)
+    preset2_tension_damping: FloatProperty(name="Structural Damp", default=10, min=0.0, max=50.0)
     preset2_compression_damping: FloatProperty(name="Compression Damp", default=10, min=0.0, max=50.0)
     preset2_shear_damping: FloatProperty(name="Shear Damp", default=10, min=0.0, max=50.0)
     preset2_bending_damping: FloatProperty(name="Bending Damp", default=1, min=0.0, max=50.0)
@@ -139,11 +139,11 @@ class SeamsToPlushSettings(PropertyGroup):
         items=[('LINEAR', "Linear", ""), ('ANGULAR', "Angular", "")],
         default='ANGULAR'
     )
-    preset3_tension_stiffness: FloatProperty(name="Tension", default=40, min=0.0, max=1000.0)
+    preset3_tension_stiffness: FloatProperty(name="Structural", default=40, min=0.0, max=1000.0)
     preset3_compression_stiffness: FloatProperty(name="Compression", default=40, min=0.0, max=1000.0)
     preset3_shear_stiffness: FloatProperty(name="Shear", default=20, min=0.0, max=1000.0)
     preset3_bending_stiffness: FloatProperty(name="Bending", default=10, min=0.0, max=1000.0)
-    preset3_tension_damping: FloatProperty(name="Tension Damp", default=15, min=0.0, max=50.0)
+    preset3_tension_damping: FloatProperty(name="Structural Damp", default=15, min=0.0, max=50.0)
     preset3_compression_damping: FloatProperty(name="Compression Damp", default=15, min=0.0, max=50.0)
     preset3_shear_damping: FloatProperty(name="Shear Damp", default=15, min=0.0, max=50.0)
     preset3_bending_damping: FloatProperty(name="Bending Damp", default=2, min=0.0, max=50.0)
